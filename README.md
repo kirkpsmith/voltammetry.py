@@ -7,6 +7,7 @@ Derived from `impedance.py` and `voltcycle`
 - [ ] blah
 - [x] blah
 
+
 # Features
 - Visualization of voltammetry data with Altair
 - *everything voltcycle does*
@@ -19,3 +20,4 @@ Derived from `impedance.py` and `voltcycle`
 - Subfunctions: catalysis, solution phase reactions, intercalation reactions,
 - Digitizer?
 - Absolute reference conversion (SCE, MSE etc.)
+- ability to specify IUPAC/US convention (default IUPAC)
