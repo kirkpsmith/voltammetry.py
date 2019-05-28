@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import altair as alt
+alt.data_transformers.enable('default', max_rows=None)
 def plot_voltammogram(t, i, v, convention = 'IUPAC'):
     """ Convenience function for plotting voltammograms
 
