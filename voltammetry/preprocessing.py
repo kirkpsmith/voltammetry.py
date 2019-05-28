@@ -5,7 +5,7 @@ Methods for preprocessing voltammetry data from instrument files
 import numpy as np
 
 
-def readFile(filename, type=None):
+def readFile(filename, type=None, scan = 'last'):
     """ A wrapper for reading in many common types of impedance files
 
     Parameters
@@ -14,6 +14,8 @@ def readFile(filename, type=None):
         Filename to extract impedance data from
     type: string
         Type of instrument file
+    scan: string
+        First scan, last scan, or average of last (n-1) scans
 
     Returns
     -------
