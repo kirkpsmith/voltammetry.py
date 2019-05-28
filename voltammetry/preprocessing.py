@@ -1,5 +1,5 @@
 """
-Methods for preprocessing impedance data from instrument files
+Methods for preprocessing voltammetry data from instrument files
 """
 
 import numpy as np
@@ -17,10 +17,12 @@ def readFile(filename, type=None):
 
     Returns
     -------
-    frequencies : np.ndarray
+    time : np.ndarray
         Array of frequencies
-    impedance : np.ndarray of complex numbers
-        Array of complex impedances
+    current : np.ndarray
+        Array of currents
+    voltage : np.ndarray
+        Array of voltages
 
     """
 
@@ -31,15 +33,15 @@ def readFile(filename, type=None):
             '{} is not a supported type ({})'.format(type, supported_types)
 
     if type == 'gamry':
-        f, Z = readGamry(filename)
+        t, i, v = readGamry(filename)
     elif type == 'autolab':
-        f, Z = readAutolab(filename)
+        t, i, v = readAutolab(filename)
     elif type == 'parstat':
-        f, Z = readParstat(filename)
+        t, i, v = readParstat(filename)
     elif type is None:
-        f, Z = readCSV(filename)
+        t, i, v = readCSV(filename)
 
-    return f, Z
+    return t, i , v
 
 
 def readGamry(filename):
@@ -52,10 +54,12 @@ def readGamry(filename):
 
     Returns
     -------
-    frequencies : np.ndarray
+    time : np.ndarray
         Array of frequencies
-    impedance : np.ndarray of complex numbers
-        Array of complex impedances
+    current : np.ndarray
+        Array of currents
+    voltage : np.ndarray
+        Array of voltages
 
     """
 
@@ -86,10 +90,12 @@ def readAutolab(filename):
 
     Returns
     -------
-    frequencies : np.ndarray
+    time : np.ndarray
         Array of frequencies
-    impedance : np.ndarray of complex numbers
-        Array of complex impedances
+    current : np.ndarray
+        Array of currents
+    voltage : np.ndarray
+        Array of voltages
 
     """
 
@@ -103,43 +109,45 @@ def readAutolab(filename):
         f.append(each[0])
         Z.append(complex(float(each[1]), float(each[2])))
 
-    return np.array(f), np.array(Z)
+    return np.array(t), np.array(i), np.array(v)
 
 
-def readParstat(filename):
-    """ function for reading the .txt file from Parstat
+# def readParstat(filename):
+#     """ function for reading the .txt file from Parstat
+#
+#     Parameters
+#     ----------
+#     filename: string
+#         Filename of .txt file to extract impedance data from
+#
+#     Returns
+#     -------
+#     time : np.ndarray
+#         Array of frequencies
+#     current : np.ndarray
+#         Array of currents
+#     voltage : np.ndarray
+#         Array of voltages
+#
+#     """
+#
+#     with open(filename, 'r') as input:
+#         lines = input.readlines()
+#
+#     raw_data = lines[1:]
+#     f, Z = [], []
+#     for line in raw_data:
+#         each = line.split()
+#         f.append(each[4])
+#         Z.append(complex(float(each[6]), float(each[7])))
+#
+#     return np.array(f), np.array(Z)
 
-    Parameters
-    ----------
-    filename: string
-        Filename of .txt file to extract impedance data from
 
-    Returns
-    -------
-    frequencies : np.ndarray
-        Array of frequencies
-    impedance : np.ndarray of complex numbers
-        Array of complex impedances
-
-    """
-
-    with open(filename, 'r') as input:
-        lines = input.readlines()
-
-    raw_data = lines[1:]
-    f, Z = [], []
-    for line in raw_data:
-        each = line.split()
-        f.append(each[4])
-        Z.append(complex(float(each[6]), float(each[7])))
-
-    return np.array(f), np.array(Z)
-
-
-def readCSV(filename):
-    data = np.genfromtxt(filename, delimiter=',')
-
-    f = data[:, 0]
-    Z = data[:, 1] + 1j*data[:, 2]
-
-    return f, Z
+# def readCSV(filename):
+#     data = np.genfromtxt(filename, delimiter=',')
+#
+#     f = data[:, 0]
+#     Z = data[:, 1] + 1j*data[:, 2]
+#
+#     return f, Z
