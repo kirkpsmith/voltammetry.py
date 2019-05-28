@@ -44,9 +44,9 @@ def readFile(filename, type=None, scan='last'):
         scans = readCSV(filename)
 
     if scan == 'first':
-        return scans[0]
+        return (col for col in scans[0])
     elif scan == 'last':
-        return scans[-1]
+        return (col for col in scans[-1])
 
     return '...'
 
@@ -74,8 +74,6 @@ def readGamry(filename, scan):
 
     with open(filename, 'r', encoding='ISO-8859-1') as input:
         lines = input.readlines()
-        print('a')
-
         start_lines, end_lines = [], []
         for i, line in enumerate(lines):
             if line.startswith('CYCLES'):
@@ -87,9 +85,6 @@ def readGamry(filename, scan):
                 end_lines.append(i)
         start_lines = start_lines[0:n_cycles]
         end_lines = end_lines[1:n_cycles+1]
-
-        print(start_lines,end_lines)
-
         scan_data = []
         for i in range(0,n_cycles):
             raw_data = lines[start_lines[i]:end_lines[i]]
