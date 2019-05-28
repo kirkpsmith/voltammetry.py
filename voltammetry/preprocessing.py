@@ -5,7 +5,7 @@ Methods for preprocessing voltammetry data from instrument files
 import numpy as np
 
 
-def readFile(filename, type=None, scan = 'last'):
+def readFile(filename, type=None, scan='last'):
     """ A wrapper for reading in many common types of impedance files
 
     Parameters
@@ -15,7 +15,7 @@ def readFile(filename, type=None, scan = 'last'):
     type: string
         Type of instrument file
     scan: string
-        First scan, last scan, or average of last (n-1) scans
+        Specify first scan, last scan, or average of last (n-1) scans
 
     Returns
     -------
@@ -35,18 +35,25 @@ def readFile(filename, type=None, scan = 'last'):
             '{} is not a supported type ({})'.format(type, supported_types)
 
     if type == 'gamry':
-        t, i, v = readGamry(filename)
+        scans = readGamry(filename, scan)
     elif type == 'autolab':
-        t, i, v = readAutolab(filename)
+        scans = readAutolab(filename, scan)
     elif type == 'parstat':
-        t, i, v = readParstat(filename)
+        scans = readParstat(filename, scan)
     elif type is None:
-        t, i, v = readCSV(filename)
+        scans = readCSV(filename)
 
-    return t, i , v
+    if scan == 'first':
+        return scans[0]
+    elif scan == 'last':
+        return scans[-1]
+
+    return '...'
 
 
-def readGamry(filename):
+
+
+def readGamry(filename, scan):
     """ function for reading the .DTA file from Gamry
 
     Parameters
@@ -67,51 +74,64 @@ def readGamry(filename):
 
     with open(filename, 'r', encoding='ISO-8859-1') as input:
         lines = input.readlines()
+        print('a')
 
-    for i, line in enumerate(lines):
-        if 'ZCURVE' in line:
-            start_line = i
+        start_lines, end_lines = [], []
+        for i, line in enumerate(lines):
+            if line.startswith('CYCLES'):
+                n_cycles = int(line.split()[2])
+            if line.startswith('SCANRATE'):
+                scan_rate = float(line.split()[2])
+            if line.startswith('CURVE'):
+                start_lines.append(i+3)
+                end_lines.append(i)
+        start_lines = start_lines[0:n_cycles]
+        end_lines = end_lines[1:n_cycles+1]
 
-    raw_data = lines[start_line + 3:]
-    f, Z = [], []
-    for line in raw_data:
-        each = line.split()
-        f.append(float(each[2]))
-        Z.append(complex(float(each[3]), float(each[4])))
+        print(start_lines,end_lines)
 
-    return np.array(f), np.array(Z)
-
-
-def readAutolab(filename):
-    """ function for reading the .csv file from Autolab
-
-    Parameters
-    ----------
-    filename: string
-        Filename of .csv file to extract impedance data from
-
-    Returns
-    -------
-    time : np.ndarray
-        Array of frequencies
-    current : np.ndarray
-        Array of currents
-    voltage : np.ndarray
-        Array of voltages
-
-    """
-
-    with open(filename, 'r') as input:
-        lines = input.readlines()
-
-    raw_data = lines[1:]
-    f, Z = [], []
-    for line in raw_data:
-        each = line.split(',')
-        f.append(each[0])
-        Z.append(complex(float(each[1]), float(each[2])))
-
-    return np.array(t), np.array(i), np.array(v)
+        scan_data = []
+        for i in range(0,n_cycles):
+            raw_data = lines[start_lines[i]:end_lines[i]]
+            t, i, v = [], [], []
+            for line in raw_data:
+                each = line.split()
+                t.append(float(each[1]))
+                i.append(float(each[3]))
+                v.append(float(each[2]))
+            scan_data.append([np.array(t),np.array(i),np.array(v)])
+        return scan_data
+#
+# def readAutolab(filename):
+#     """ function for reading the .csv file from Autolab
+#
+#     Parameters
+#     ----------
+#     filename: string
+#         Filename of .csv file to extract impedance data from
+#
+#     Returns
+#     -------
+#     time : np.ndarray
+#         Array of frequencies
+#     current : np.ndarray
+#         Array of currents
+#     voltage : np.ndarray
+#         Array of voltages
+#
+#     """
+#
+#     with open(filename, 'r') as input:
+#         lines = input.readlines()
+#
+#     raw_data = lines[1:]
+#     f, Z = [], []
+#     for line in raw_data:
+#         each = line.split(',')
+#         f.append(each[0])
+#         Z.append(complex(float(each[1]), float(each[2])))
+#
+#     return np.array(t), np.array(i), np.array(v)
 
 
 # def readParstat(filename):
