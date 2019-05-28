@@ -6,7 +6,6 @@ Derived from `impedance.py` and `voltcycle`
 # TO DO
 - [ ] Detect multiple peaks (modify 'peak_detection_fxn' in voltcycle/app/core.py)
 - [ ] Deal with multiple experiment cycles
-- [ ] Machine learning
 
 # Features
 - Visualization of voltammetry data with Altair (V vs. t, I vs. T, and V vs. I, for multiple cycles), intuitive knowledge of scan directions
