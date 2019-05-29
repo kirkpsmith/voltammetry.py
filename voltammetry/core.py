@@ -187,7 +187,7 @@ def split(vector):
     assert isinstance(vector, pd.core.series.Series), "Input should be pandas series"
     split_top = int(len(vector)/2)
     end = int(len(vector))
-    vector1 = np.array(vector)[0:split]
+    vector1 = np.array(vector)[0:split_top]
     vector2 = np.array(vector)[split_top:end]
     return vector1, vector2
 
