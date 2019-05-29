@@ -1,4 +1,4 @@
-x# This is a tool to automate cyclic voltametry analysis.
+# This is a tool to automate cyclic voltametry analysis.
 # Current Version = 1
 
 import copy
