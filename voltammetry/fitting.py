@@ -9,24 +9,94 @@ import peakutils
 import scipy
 from scipy.signal import savgol_filter
 
-def peak_find(potential, current):
-    # Smooth the current curve, the window and order are emperical
-    sm_cur = savgol_filter(current, 21, 5, mode='nearest')
-    der_1 = np.diff(sm_cur)
-    max_der = max(der_1)
-    min_der = min(der_1)
-    max_der_pt =  np.argmin(abs(der_1 - max_der))
-    min_der_pt =  np.argmin(abs(der_1 - min_der))
+def peak_find(potential_1, current_1, potential_2, current_2):
+    # Having only one peak, situation 1
+    if max(abs(current_1))/max(abs(current_2)) > 100:
+        sm_cur_1 = savgol_filter(current_1, 21, 5, mode='nearest')
+        der_1 = np.diff(sm_cur_1)
+        max_der_1 = max(der_1)
+        min_der_1 = min(der_1)
+        max_der_pt_1 =  np.argmin(abs(der_1 - max_der_1))
+        min_der_pt_1 =  np.argmin(abs(der_1 - min_der_1))
 
-    # Find 0 in the first derivative
-    if max(sm_cur)+min(sm_cur)>0:
-        peak_pt = np.argmin(abs(der_1[max_der_pt:min_der_pt] - 0))
-        peak_pot = potential[peak_pt+max_der_pt]
-        peak_cur = current[peak_pt+max_der_pt]
+        if max(sm_cur_1)+min(sm_cur_1)>0:
+            peak_pt_1 = np.argmin(abs(der_1[max_der_pt_1:min_der_pt_1] - 0))
+            peak_pot_1 = potential_1[peak_pt_1+max_der_pt_1]
+            peak_cur_1 = current_1[peak_pt_1+max_der_pt_1]
+
+        else:
+            peak_pt_1 = np.argmin(abs(der_1[min_der_pt_1:max_der_pt_1] - 0))
+            peak_pot_1 = potential_1[peak_pt_1+min_der_pt_1]
+            peak_cur_1 = current_1[peak_pt_1+min_der_pt_1]
+
+
+        peak_pt = [peak_pt_1]
+        peak_pot = [peak_pot_1]
+        peak_cur = [peak_cur_1]
+    # Having only one peak, situation 2
+    elif max(abs(current_1))/max(abs(current_2)) < 0.01:
+        sm_cur_2 = savgol_filter(current_2, 21, 5, mode='nearest')
+        der_2 = np.diff(sm_cur_2)
+        max_der_2 = max(der_2)
+        min_der_2 = min(der_2)
+        max_der_pt_2 =  np.argmin(abs(der_2 - max_der_2))
+        min_der_pt_2 =  np.argmin(abs(der_2 - min_der_2))
+        if max(sm_cur_2)+min(sm_cur_2)<0:
+            peak_pt_2 = np.argmin(abs(der_2[min_der_pt_2:max_der_pt_2] - 0))
+            peak_pot_2 = potential_2[peak_pt_2+min_der_pt_2]
+            peak_cur_2 = current_2[peak_pt_2+min_der_pt_2]
+        else:
+            peak_pt_2 = np.argmin(abs(der_2[max_der_pt_2:min_der_pt_2] - 0))
+            peak_pot_2 = potential_2[peak_pt_2+max_der_pt_2]
+            peak_cur_2 = current_2[peak_pt_2+max_der_pt_2]
+
+        peak_pt = [peak_pt_2]
+        peak_pot = [peak_pot_2]
+        peak_cur = [peak_cur_2]
+
+    #Having both cathodic and anodic peaks
     else:
-        peak_pt = np.argmin(abs(der_1[min_der_pt:max_der_pt] - 0))
-        peak_pot = potential[peak_pt+min_der_pt]
-        peak_cur = current[peak_pt+min_der_pt]
+        # process the first 1/2 of the CV
+        sm_cur_1 = savgol_filter(current_1, 21, 5, mode='nearest')
+        der_1 = np.diff(sm_cur_1)
+        max_der_1 = max(der_1)
+        min_der_1 = min(der_1)
+        max_der_pt_1 =  np.argmin(abs(der_1 - max_der_1))
+        min_der_pt_1 =  np.argmin(abs(der_1 - min_der_1))
+        # process the 2nd 1/2 of the CV
+        sm_cur_2 = savgol_filter(current_2, 21, 5, mode='nearest')
+        der_2 = np.diff(sm_cur_2)
+        max_der_2 = max(der_2)
+        min_der_2 = min(der_2)
+        max_der_pt_2 =  np.argmin(abs(der_2 - max_der_2))
+        min_der_pt_2 =  np.argmin(abs(der_2 - min_der_2))
+        # Find 0 in the first derivative
+        if max(sm_cur_1)+min(sm_cur_1)>0 and min_der_pt_1>max_der_pt_1 and min_der_pt_2<max_der_pt_2:
+            peak_pt_1 = np.argmin(abs(der_1[max_der_pt_1:min_der_pt_1] - 0))
+            peak_pot_1 = potential_1[peak_pt_1+max_der_pt_1]
+            peak_cur_1 = current_1[peak_pt_1+max_der_pt_1]
+            peak_pt_2 = np.argmin(abs(der_2[min_der_pt_2:max_der_pt_2] - 0))
+            peak_pot_2 = potential_2[peak_pt_2+min_der_pt_2]
+            peak_cur_2 = current_2[peak_pt_2+min_der_pt_2]
+            peak_pt = [peak_pt_1,peak_pt_2]
+            peak_pot = [peak_pot_1,peak_pot_2]
+            peak_cur = [peak_cur_1,peak_cur_2]
+        elif max(sm_cur_1)+min(sm_cur_1)<=0 and min_der_pt_1<max_der_pt_1 and min_der_pt_2>max_der_pt_2:
+            peak_pt_1 = np.argmin(abs(der_1[min_der_pt_1:max_der_pt_1] - 0))
+            peak_pot_1 = potential_1[peak_pt_1+min_der_pt_1]
+            peak_cur_1 = current_1[peak_pt_1+min_der_pt_1]
+            peak_pt_2 = np.argmin(abs(der_2[max_der_pt_2:min_der_pt_2] - 0))
+            peak_pot_2 = potential_2[peak_pt_2+max_der_pt_2]
+            peak_cur_2 = current_2[peak_pt_2+max_der_pt_2]
+            peak_pt = [peak_pt_1,peak_pt_2]
+            peak_pot = [peak_pot_1,peak_pot_2]
+            peak_cur = [peak_cur_1,peak_cur_2]
+        else:
+            peak_pt = []
+            peak_pot = []
+            peak_cur = []
+
+
 
 
     return peak_pt, peak_pot, peak_cur
