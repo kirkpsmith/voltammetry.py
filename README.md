@@ -26,3 +26,5 @@ Derived from `impedance.py` and `voltcycle`
 - establish which voltammetry methods are fundamental across applications, add to those already implemented with `voltcycle` and tidy up
 - establish which voltammetry methods are ripe for automation (like hydrogen absorption calculation)
 - high-touch user input mode for complex coupled rxns vs. automatic mode for high-throughput analysis of well-understood systems
+
+Drew made changes.
