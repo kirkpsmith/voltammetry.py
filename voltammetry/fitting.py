@@ -101,5 +101,35 @@ def peak_find(potential_1, current_1, potential_2, current_2):
 
     return peak_pt, peak_pot, peak_cur
 
-#def baseline(current)
-    # Deep
+def baseline(potential_1, current_1, potential_2, current_2):
+    # Deep smoothing of first derivative
+    sm_cur_1 = savgol_filter(current_1, 301, 5, mode='nearest')
+    first_dev_1 = np.diff(sm_cur_1)/np.diff(potential_1)
+    sm_first_dev_1 = savgol_filter(first_dev_1, 301, 5, mode='nearest')
+    second_dev_1 = np.diff(sm_first_dev_1)
+    sm_second_dev_1 = savgol_filter(second_dev_1, 201, 5, mode='nearest')
+    third_dev_1 = np.diff(sm_second_dev_1)
+    sm_third_dev_1 = savgol_filter(third_dev_1, 301, 5, mode='nearest')
+
+    baseline_pt_1 = np.argmin(abs(sm_third_dev_1[10:500] - 0))
+    baseline_slope_1 = sm_first_dev_1[baseline_pt_1]
+    baseline_intercept_1 = current_1[baseline_pt_1]-baseline_slope_1*potential_1[baseline_pt_1]
+
+    baseline_1 = baseline_slope_1 * potential_1 + baseline_intercept_1
+
+
+    sm_cur_2 = savgol_filter(current_2, 301, 5, mode='nearest')
+    first_dev_2 = np.diff(sm_cur_2)/np.diff(potential_2)
+    sm_first_dev_2 = savgol_filter(first_dev_2, 301, 5, mode='nearest')
+    second_dev_2 = np.diff(sm_first_dev_2)
+    sm_second_dev_2 = savgol_filter(second_dev_2, 201, 5, mode='nearest')
+    third_dev_2 = np.diff(sm_second_dev_2)
+    sm_third_dev_2 = savgol_filter(third_dev_2, 301, 5, mode='nearest')
+
+    baseline_pt_2 = np.argmin(abs(sm_third_dev_2[10:500] - 0))
+    baseline_slope_2 = sm_first_dev_2[baseline_pt_2]
+    baseline_intercept_2 = current_2[baseline_pt_2]-baseline_slope_2*potential_2[baseline_pt_2]
+
+    baseline_2 = baseline_slope_2 * potential_2 + baseline_intercept_2
+
+    return baseline_1,baseline_2
