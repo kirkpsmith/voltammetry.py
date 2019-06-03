@@ -6,7 +6,6 @@ import copy
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import peakutils
 
 
 def read_cycle(data):

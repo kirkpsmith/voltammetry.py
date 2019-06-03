@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import altair as alt
 alt.data_transformers.enable('default', max_rows=None)
-def plot_voltammogram(t, i, v, convention = 'IUPAC', peaks = None):
+def plot_voltammogram(t, i, v, convention = 'IUPAC', peaks = None, baselines = None):
     """ Convenience function for plotting voltammograms
 
 
@@ -31,7 +31,7 @@ def plot_voltammogram(t, i, v, convention = 'IUPAC', peaks = None):
         'v': v,
     })
 
-    chart = alt.Chart(source).mark_point().encode(
+    chart = alt.Chart(source).mark_line().encode(
     x='v:Q',
     y='i:Q'
     )
@@ -40,6 +40,14 @@ def plot_voltammogram(t, i, v, convention = 'IUPAC', peaks = None):
         peak_chart = alt.Chart(source).mark_point(filled=True, size=50).encode(
         x='v:Q',
         y='i:Q',
+        color=alt.value('black')
+        )
+        chart = chart + peak_chart
+    if baselines is not None:
+        source = pd.DataFrame(baselines,columns=['b1','b2'])
+        peak_chart = alt.Chart(source).mark_point(filled=True, size=50).encode(
+        x='b1:Q',
+        y='b2:Q',
         color=alt.value('black')
         )
         chart = chart + peak_chart
