@@ -1,13 +1,9 @@
 # voltammetry.py
-A Python package for working with voltammetry data
+An effort towards a Python package for working with voltammetry data
 
 Inspired by [`impedance.py`](https://github.com/ECSHackWeek/impedance.py) and [`voltcycle`](https://github.com/sabiharustam/voltcycle)
 
-# TO DO
-- establish which voltammetry methods are ripe for automation (like hydrogen absorption calculation)
-
-
-# Features
+# Desired Features
 - Visualization of voltammetry data with Altair (V vs. t, I vs. T, and V vs. I, for multiple cycles), intuitive knowledge of scan directions
 - ability to specify IUPAC/US convention (default IUPAC)
 - Peak finding, baseline fitting
